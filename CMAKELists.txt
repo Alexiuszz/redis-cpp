@@ -8,6 +8,8 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 file(GLOB SRC_FILES src/*.cpp)
 add_executable(redis_cpp ${SRC_FILES})
+target_include_directories(redis_cpp PRIVATE ${CMAKE_SOURCE_DIR}/external/asio/asio/include)
+target_compile_definitions(redis_cpp PRIVATE ASIO_STANDALONE)
 
 # optional: tests
 option(ENABLE_TESTS "Build unit tests" ON)
