@@ -4,16 +4,33 @@ project(redis_cpp LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
-file(GLOB SRC_FILES src/*.cpp)
+file(GLOB SRC_FILES CONFIGURE_DEPENDS src/*.cpp)
 add_executable(redis_cpp ${SRC_FILES})
-target_include_directories(redis_cpp PRIVATE ${CMAKE_SOURCE_DIR}/external/asio/asio/include)
+target_include_directories(
+  redis_cpp
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/external/asio/asio/include
+)
 target_compile_definitions(redis_cpp PRIVATE ASIO_STANDALONE)
 
-# optional: tests
-option(ENABLE_TESTS "Build unit tests" ON)
-if(ENABLE_TESTS AND EXISTS "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt")
+option(ENABLE_TESTS "Enable building and running unit tests for the project" ON)
+if(ENABLE_TESTS)
+  include(CTest)
   enable_testing()
-  add_subdirectory(tests)
+
+  find_package(GTest REQUIRED)
+  file(GLOB TEST_FILES tests/*.cpp)
+  if(TEST_FILES)
+    add_executable(run_tests ${TEST_FILES})
+    target_include_directories(
+      run_tests
+      PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/external/asio/asio/include
+    )
+    target_compile_definitions(run_tests PRIVATE ASIO_STANDALONE)
+    target_link_libraries(run_tests PRIVATE GTest::GTest GTest::Main)
+    add_test(NAME run_tests COMMAND run_tests)
+  endif()
 endif()

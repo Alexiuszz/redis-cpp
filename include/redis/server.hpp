@@ -8,6 +8,7 @@ namespace redis
     {
     public:
         Server(const std::string &address, int port);
+        Server(int port);
         void start();
         void stop();
 

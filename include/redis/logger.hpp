@@ -1,6 +1,8 @@
 #pragma once
+
 #include <iostream>
 #include <mutex>
+#include <utility>
 
 namespace redis
 {
@@ -13,7 +15,7 @@ namespace redis
         static void info(Args &&...args)
         {
             std::lock_guard<std::mutex> l(mtx_);
-            (std::cout << ... << args) << std::endl;
+            (std::cout << ... << std::forward<Args>(args)) << std::endl;
         }
     };
 }
